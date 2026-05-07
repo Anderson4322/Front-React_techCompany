@@ -1,5 +1,7 @@
-import { useState } from "react";
-import Header from "../components/Header/index.jsx";
+import { useState, useEffect } from "react";
+import Header from "../../components/Header/Header.jsx";
+import { api } from "../../../api/api-config.js";
+import axios from "axios";
 
 export default function App() {
   const [open, setOpen] = useState(false);
@@ -9,58 +11,127 @@ export default function App() {
   const [modelo, setModelo] = useState("");
   const [telefone, setTelefone] = useState("");
   const [msg, setMsg] = useState("");
+  const [dados, setDados] = useState([]);
+  const [imagem, setImagem] = useState("");
+
+  async function buscarUsuarios() {
+    try {
+      const resposta = await api.get(`/pedidos`);
+      setDados(resposta.data);
+      console.log("Componente montado ou dado alterado");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    buscarUsuarios();
+  }, []);
 
   function trocar() {
-    nome == "" || descricao== "" || tipoeletronico == "" || modelo == "" || telefone == ""
+    nome == "" ||
+    descricao == "" ||
+    tipoeletronico == "" ||
+    modelo == "" ||
+    telefone == "" ||
+    imagem == ""
       ? setMsg("Preencha todos os Campos!!!!")
       : cadastrar();
   }
- function limpar() {
+  function limpar() {
     setModelo("");
     setDes("");
     setTipo("");
     setTelefone("");
     setMsg("");
     setNome("");
-    
+    imagem("");
   }
+  const formData = new FormData();
+  formData.append("descricao", descricao);
+  formData.append("nome", nome);
+  formData.append("tipoeletronico", tipoeletronico);
+  formData.append("modelo", modelo);
+  formData.append("telefone", telefone);
+  formData.append("imagem", imagem);
 
   async function cadastrar() {
-    const resposta = await fetch("http://192.168.1.23:3000/cad_pedidos", {
-      method: "POST",
-      headers: { "Content-Type": "application/JSON" },
-      body: JSON.stringify({
-        nome: nome,
-        descricao: descricao,
-        tipoeletronico: tipoeletronico,
-        modelo: modelo,
-        telefone: telefone,
-      }),
-    });
-    if (resposta.status == 201) {
-      return window.location.reload();
-    } else {
-      alert("Erro ao cadastro de pedido");
+    try {
+      const resposta = await fetch("http://192.168.1.9:3000/cad_pedidos", {
+        method: "POST",
+        body: formData,
+      });
+      if (resposta.status == 201) {
+        return window.location.reload();
+      } else {
+        alert("Erro ao cadastro de pedido");
+      }
+    } catch (error) {
+      console.log("erro");
     }
   }
 
   return (
     <div>
-    <Header/>
+      <Header />
 
       <main className="flex flex-col max-w-1200px mx-auto px-5 py-10">
-        <h1 className="text-center text-[#0d1aa6] mb-30px text-5xl">
+        <h1 className="text-center text-[#0d1aa6] mb-30px text-5xl font-semibold">
           CONSERTO DE ELETRÔNICOS
         </h1>
         <div className="flex ">
           <button
             onClick={() => setOpen(true)}
-            className="bg-[#0d1aa6] text-white border-none  p-4 py-3 rounded-[10px] mb-10 cursor-pointer block"
+            className="bg-[#0d1aa6] text-white border-none  p-4 py-3 rounded-[10px] mb-10 cursor-pointer block font-semibold"
           >
             {" "}
             + Publicar Problema
           </button>
         </div>
+
+        <main className="w-full p-2 rounded-2xl flex gap-10 flex-wrap">
+          {dados.map((p) => {
+            const byteArray = new Uint8Array(p.data.data);
+            const blob = new Blob([byteArray], { type: "image/png" });
+            const url = URL.createObjectURL(blob);
+            return (
+              <div
+                className="  bg-white rounded-[18px] p-4 w-55 flex flex-col gap-1 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                key={p.id_pedido}
+              >
+                <img src={url} />
+                <p className="self-start text-[12px] px-3 py-5px rounded-[20px] font-semibold bg-[#e3e8ff] text-[#3b4eff]">
+                  {p.tipoeletronico}
+                </p>
+
+                <h3 className="text-[20px] font-semibold text-[#222] ">
+                  {p.nome}
+                </h3>
+
+                <h5 className="text-[13px] text-[#777]">
+                  Número de Contato:{p.telefone}
+                </h5>
+
+                <hr></hr>
+
+                <h4 className="text-[15px] font-medium text-[#444] pt-5px border-t border-[#eee]">
+                  {p.modelo}
+                </h4>
+
+                <p className="text-[14px] text-[#666] leading-[1.4]">
+                  Descrição:{p.descricao}
+                </p>
+
+                <h3 className="mt-10px text-[18px] font-bold text-[#0d1aa6]">
+                  Valor: R$ {p.valor}
+                </h3>
+
+                <p>{p.comentario}</p>
+                <div className="flex gap-3 text-2xl"></div>
+              </div>
+            );
+          })}
+        </main>
       </main>
 
       {open && (
@@ -73,6 +144,13 @@ export default function App() {
               <p className=" text-xl mb-4 text-red-700"> {msg}</p>
             </div>
             <div className="p-6">
+              <label className="text-black font-medium">Imagem</label>
+              <input
+                type="file"
+                onChange={(e) => setImagem(e.target.files[0])}
+                className="w-full border border-black rounded p-2 text-black"
+              />
+
               <label className="text-black font-medium">Nome:</label>
               <input
                 type="text"
@@ -107,7 +185,9 @@ export default function App() {
                 onChange={(e) => setTelefone(e.target.value)}
               />
               <div className="flex flex-col">
-                <label className="text-black font-medium">Tipo de Eletrônico:</label>
+                <label className="text-black font-medium">
+                  Tipo de Eletrônico:
+                </label>
                 <select
                   value={tipoeletronico}
                   onChange={(e) => setTipo(e.target.value)}
