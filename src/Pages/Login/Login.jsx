@@ -16,13 +16,14 @@ export default function Login() {
 
       localStorage.setItem("nome", resposta.data.nome);
       localStorage.setItem("nivel", resposta.data.nivel);
-      localStorage.setItem("gmail", resposta.data.email);
+      localStorage.setItem("id", resposta.data.id_usuario);
+      localStorage.setItem("imagem", resposta.data.data)
     if(resposta.nivel==3){
       navigate("/Admin")
   
     }
     else{
-      navigate("/");
+      navigate("/", {replace:true});
     }
     } catch (erro) {
       alert("Erro ao logar");
@@ -77,7 +78,7 @@ export default function Login() {
             onChange={(e) => {
               setSenha(e.target.value);
             }}
-            type="text"
+            type="password"
             placeholder="Digite sua senha"
           />
 

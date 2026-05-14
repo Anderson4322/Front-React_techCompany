@@ -42,7 +42,7 @@ export default function Header() {
       : AtualizarPerfil();
   }
   return (
-    <header className="flex items-center justify-between bg-[#0d1aa6] px-6 h-25 w-full shadow-[0_4px_20px_rgba(0,0,0,0.2)]  top-0 z-1000 text-white">
+    <header className="items-center justify-between bg-[#0d1aa6] min-w-5xl hidden px-6 h-25 w-full shadow-[0_4px_20px_rgba(0,0,0,0.2)]  top-0 z-1000 text-white">
       <img src="/Logo.svg" className="h-12 object-contain" />
 
       <div className="flex gap-6 text-lg">

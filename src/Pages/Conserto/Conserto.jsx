@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import Header from "../../components/Header/Header.jsx";
 import { api } from "../../../api/api-config.js";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const [open, setOpen] = useState(false);
+  const [alerta, setAlerta] = useState(localStorage.getItem("nivel"));
   const [nome, setNome] = useState("");
   const [descricao, setDes] = useState("");
   const [tipoeletronico, setTipo] = useState("");
@@ -13,6 +15,7 @@ export default function App() {
   const [msg, setMsg] = useState("");
   const [dados, setDados] = useState([]);
   const [imagem, setImagem] = useState("");
+  const navigate = useNavigate();
 
   async function buscarUsuarios() {
     try {
@@ -47,6 +50,9 @@ export default function App() {
     setNome("");
     imagem("");
   }
+  function Login() {
+    navigate("/Login");
+  }
   const formData = new FormData();
   formData.append("descricao", descricao);
   formData.append("nome", nome);
@@ -56,18 +62,17 @@ export default function App() {
   formData.append("imagem", imagem);
 
   async function cadastrar() {
+    const usuario = localStorage.getItem("nome");
+
     try {
-      const resposta = await fetch("http://192.168.1.9:3000/cad_pedidos", {
-        method: "POST",
-        body: formData,
-      });
+      const resposta = await api.post(`/cad_pedidos`, formData);
       if (resposta.status == 201) {
         return window.location.reload();
       } else {
         alert("Erro ao cadastro de pedido");
       }
     } catch (error) {
-      console.log("erro");
+      alert("Erro inesperado");
     }
   }
 
@@ -122,17 +127,34 @@ export default function App() {
                   Descrição:{p.descricao}
                 </p>
 
-                <h3 className="mt-10px text-[18px] font-bold text-[#0d1aa6]">
-                  Valor: R$ {p.valor}
-                </h3>
-
+              <details>
+                <summary>Comentarios</summary>
                 <p>{p.comentario}</p>
+              </details>
                 <div className="flex gap-3 text-2xl"></div>
               </div>
             );
           })}
         </main>
       </main>
+
+      {!alerta && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center w-screen ">
+          <div className="w-180 rounded-2xl shadow-xl/30 h-45 border-2 bg-white p-4">
+            <button
+              onClick={() => Login()}
+              className="w-15 rounded-4xl h-10 bg-red-500 hover:bg-red-700"
+            >
+              X
+            </button>
+
+            <p className="text-3xl text-blue-700">
+              Ops parece parece que voce nao realizou o login...
+            </p>
+            <p className="text-center mt-2">Feche para ser direcionado a pagina</p>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center w-screen ">
@@ -201,10 +223,7 @@ export default function App() {
               </div>
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => {
-                    limpar();
-                    setOpen(false);
-                  }}
+                  onClick={() => {setOpen(false), limpar()}}
                   className="px-4 py-2 bg-gray-300 rounded text-black"
                 >
                   Cancelar

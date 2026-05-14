@@ -2,7 +2,9 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdModeEdit } from "react-icons/md";
-import { IoTrashOutline } from "react-icons/io5";
+import { IoTrashBinOutline } from "react-icons/io5";
+import { GoPencil } from "react-icons/go";
+
 import { api } from "../../../api/api-config.js";
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -11,7 +13,8 @@ export default function Header() {
   const [senha, setSenha] = useState(0);
   const [endereco, setEndereco] = useState("");
   const [nivel, setNivel] = useState("");
-  const [conta] = useState(localStorage.getItem("nome"))
+  const [conta, setConta] = useState("")
+  const [perfil, setPerfil] = useState(localStorage.getItem("nome"))
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
 
@@ -47,33 +50,71 @@ export default function Header() {
 
   async function CadastroUser() {
     const resposta = await api.post(`/admin/cadastro`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
         nome,
         email,
         senha,
         endereco,
         nivel,
-      }),
     });
     resposta.status == 200
       ? (alert("Cadastro concluido"), setUsuarios(...usuarios, {nome, email, senha, endereco, nivel}))
       : alert("Erro ao cadastrar");
   }
+
   function Login() {
     navigate("/login");
   }
 
-  function Admin() {}
+  function Home() {
+    navigate("/")
+  }
+
+  async function ExcluirPedido(id) {
+      try{
+
+        const resposta = await api.delete(`deletar_pedido/${id}`, {
+           
+        })
+        if(resposta.status === 200){
+            alert("Pedido deletado com sucesso!");
+            window.location.reload();
+        }
+        else{
+            return alert("Erro ao deletar pedido!");
+        }
+      } catch(error){
+        console.log(error)
+      }
+
+  }
+
+  async function ExcluirUser(id) {
+    try{
+
+      const resposta = await api.delete(`deletar_user/${id}`, {
+         
+      }
+      );
+      if (resposta.status == 200) {
+        window.location.reload();
+        return alert("Usuario deletado!");
+      } 
+        else {
+          return alert("Erro ao deletar usuário!");
+        }
+    } catch(error){
+      console.log(error)
+    }
+    
+  }
 
   return (
     <div>
-      <header className="w-full h-15 bg-[#0d1aa6] text-white  ; flex items-center justify-between p-10">
+      <header className="w-full h-15 md:bg-[#0d1aa6]
+  min-w-sm text-white  ; flex items-center justify-between p-10">
         <h1>Painel Administrativo</h1>
-        <h2>{conta}</h2>
-        <button className=" w-15 rounded bg-white text-black hover:bg-gray-400">
+        <h2>{!perfil ? "Bem vindo visitante": `Bem vindo administrador: ${perfil}`}</h2>
+        <button onClick={()=>Home()} className=" w-15 rounded bg-white text-black hover:bg-gray-400">
           Home
         </button>
         <button
@@ -166,14 +207,10 @@ export default function Header() {
               <p>{p.nome}</p>
               <p>{p.email}</p>
               <p>Nivel conta: {p.nivel}</p>
-              <div className="flex gap-3 text-2xl">
-                <MdModeEdit
-                  className="bg-gray-400 hover:scale-125"
-                  onClick={() => editar(p.id_usuario)}
-                />
-                <IoTrashOutline
-                  className="bg-gray-400 hover:scale-125"
-                  onClick={() => excluir(p.id_usuario)}
+              <div className="flex gap-5 text-2xl">
+                <IoTrashBinOutline 
+                  className="hover:scale-125"
+                  onClick={() => ExcluirUser(p.id_usuario)}
                 />
               </div>
             </div>
@@ -224,7 +261,12 @@ export default function Header() {
                 </h3>
 
                 <p>{p.comentario}</p>
-                <div className="flex gap-3 text-2xl"></div>
+                <div className="flex gap-3 text-2xl">
+                   <IoTrashBinOutline 
+                  className="hover:scale-125"
+                  onClick={() => ExcluirPedido(p.id_pedido)}
+                />
+                </div>
               </div>
             );
           })}

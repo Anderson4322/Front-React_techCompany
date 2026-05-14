@@ -10,15 +10,14 @@ function App() {
   const navigate = useNavigate();
   async function Cadastro() {
     try {
-      const resposta = await api.post(`/cadastro/user`, {
+      const resposta = await api.post('/cadastro/user', {
         nome,
         email,
         senha,
         endereco,
-    
       });
 
-      if (resposta.status === 201) {
+      if (resposta.status == 201) {
         alert("Cadastrado com sucesso");
         navigate("/Login");
       } else {

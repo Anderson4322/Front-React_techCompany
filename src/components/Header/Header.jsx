@@ -4,14 +4,18 @@ import { api } from "../../../api/api-config";
 
 export default function Header() {
   const [menuAberto, setMenuAberto] = useState(false);
+  const [conta, setConta] = useState(localStorage.getItem("nome"));
   const [open, setOpen] = useState(false);
+  const [perfil, setPerfil] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState(0);
   const [endereco, setEndereco] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [imagem, setImagem] = useState(null);
+  const id = localStorage.getItem("id");
+  const [imagem, setImagem] = useState("");
   const [msg, setMsg] = useState("");
-  const [fotoPerfil, setFotoPerfil] = useState("/perfil.jpg");
+
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -29,45 +33,34 @@ export default function Header() {
     setNome("");
     setEndereco("");
     setTelefone("");
+    setSenha("");
     setImagem(null);
     setMsg("");
-    setFotoPerfil("/perfil.jpg");
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   }
 
-  async function AtualizarPerfil() {
+  async function AtualizarPerfil(id) {
     try {
-      const formData = new FormData();
+      const resposta = await api.put(
+        `/alt_user/${id}`,
+        nome,
+        senha,
+        endereco,
+        telefone,
+      );
+      console.log(id);
 
-      formData.append("nome", nome);
-      formData.append("email", email);
-      formData.append("endereco", endereco);
-      formData.append("telefone", telefone);
-
-      if (imagem) {
-        formData.append("imagem", imagem);
-      }
-
-      const resposta = await api.put("/alt_user/1", formData);
-
-      if (resposta.status === 200) {
-        console.log("concluido");
-
-        limpar();
-
+      if (resposta.status == 201) {
         setOpen(false);
+        alert("Perfil atualizado");
       } else {
-        console.log("algo deu errado");
+        return alert("algo deu errado");
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  function trocar() {
+  function Trocar() {
     if (
       nome === "" ||
       endereco === "" ||
@@ -82,30 +75,86 @@ export default function Header() {
     AtualizarPerfil();
   }
 
+  function converter() {
+    if (!imagem) return null;
+
+    const byteArray = new Uint8Array(imagem.data || imagem);
+    const blob = new Blob([byteArray], { type: "image/png" });
+
+    return URL.createObjectURL(blob);
+  }
+
+  async function ImagemPerfil() {
+    const formData = new FormData();
+
+    formData.append("imagem", imagem);
+    formData.append("id", id)
+    try {
+      const resposta = await api.put(`/imagem`, formData);
+      if (resposta.status == 201) {
+        alert("Perfil atualizado!");
+        return window.location.reload();
+      } else {
+        alert("Erro ao atualizar perfil");
+      }
+    } catch (error) {
+      alert("Erro inesperado");
+    }
+  }
+
   return (
     <header className="flex items-center justify-between bg-[#0d1aa6] px-6 h-25 w-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] text-white">
-      <img src="/Logo.svg" className="h-12 object-contain" />
+      <img src="../public/logo.svg" className="h-12 object-contain" />
 
       <div className="flex gap-6 text-lg">
-        <Link to="/sobrenos" className="hover:underline">
+        <button onClick={() => navigate("/Sobre")} className="hover:underline">
           Sobre Nós
-        </Link>
+        </button>
 
-        <Link to="/conserto" className="hover:underline">
+        <button
+          onClick={() => navigate("/Conserto")}
+          className="hover:underline"
+        >
           Conserto
-        </Link>
+        </button>
 
-        <Link to="/homepage" className="hover:underline">
+        <button onClick={() => navigate("/")} className="hover:underline">
           HomePage
-        </Link>
+        </button>
       </div>
 
       <div className="flex items-center gap-4">
+        <h5>{conta}</h5>
         <img
-          src={fotoPerfil}
+          onClick={() => setPerfil(true)}
+          src={converter()}
           alt="Perfil"
           className="w-10 h-10 rounded-full object-cover border-2 border-white"
         />
+
+        {perfil && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center w-screen ">
+            <div className="w-180 rounded-2xl shadow-xl/30 h-70 border-2 bg-white p-4">
+              <button
+                onClick={() => setPerfil(false)}
+                className="w-15 rounded-4xl h-10 bg-red-500 hover:bg-red-700"
+              >
+                X
+              </button>
+              <div className="w-full flex flex-col justify-center gap-5 items-center p-2 ">
+                <label className="text-black  font-medium">Imagem</label>
+                <input
+                  type="file"
+                  onChange={(e) => setImagem(e.target.files[0])}
+                  className="w-full border border-black rounded p-2 text-black"
+                />
+                <button onClick={()=> ImagemPerfil()} className="w-50 h-10 bg-blue-600 text-white rounded hover:bg-[#0d1aa6]">
+                  Atualizar foto
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <button onClick={AbrirMenu} className="cursor-pointer">
           <img src="/menu.svg" className="h-6" alt="Menu" />
@@ -143,29 +192,12 @@ export default function Header() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-black font-medium">Imagem</label>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={(e) => {
-                    const arquivo = e.target.files[0];
-
-                    setImagem(arquivo);
-
-                    if (arquivo) {
-                      setFotoPerfil(URL.createObjectURL(arquivo));
-                    }
-                  }}
-                  className="w-full border border-black rounded p-2 text-black"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
                 <label className="text-black font-medium">Nome:</label>
 
                 <input
                   value={nome}
+                  type="text"
+                  required
                   onChange={(e) => setNome(e.target.value)}
                   className="w-full border border-black rounded p-2 text-black"
                 />
@@ -176,6 +208,7 @@ export default function Header() {
 
                 <input
                   value={email}
+                  type="email"
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border border-black rounded p-2 text-black"
                 />
@@ -186,6 +219,7 @@ export default function Header() {
 
                 <input
                   value={endereco}
+                  type="text"
                   onChange={(e) => setEndereco(e.target.value)}
                   className="w-full border border-black rounded p-2 text-black"
                 />
@@ -196,7 +230,18 @@ export default function Header() {
 
                 <input
                   value={telefone}
+                  type="tel"
                   onChange={(e) => setTelefone(e.target.value)}
+                  className="w-full border border-black rounded p-2 text-black"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-black font-medium">Senha:</label>
+
+                <input
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
                   className="w-full border border-black rounded p-2 text-black"
                 />
               </div>
@@ -213,7 +258,7 @@ export default function Header() {
                 </button>
 
                 <button
-                  onClick={trocar}
+                  onClick={() => AtualizarPerfil(id)}
                   className="px-4 py-2 bg-[#0d1aa6] text-white rounded"
                 >
                   Enviar
