@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { Link, RouterProvider, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { api } from "../../../api/api-config";
 
 export default function Header() {
@@ -13,7 +13,7 @@ export default function Header() {
   const [endereco, setEndereco] = useState("");
   const [telefone, setTelefone] = useState("");
   const id = localStorage.getItem("id");
-  const [imagem, setImagem] = useState("");
+  const [imagem, setImagem] = useState(null);
   const [msg, setMsg] = useState("");
 
   const navigate = useNavigate();
@@ -75,22 +75,26 @@ export default function Header() {
     AtualizarPerfil();
   }
 
-  function converter() {
-    if (!imagem) return null;
+  // function converter() {
+  //   console.log(imagem);
+  //   if (!imagem) return null;
 
-    const byteArray = new Uint8Array(imagem.data || imagem);
-    const blob = new Blob([byteArray], { type: "image/png" });
+  //   const byteArray = new Uint8Array(imagem.data || imagem);
+  //   const blob = new Blob([byteArray], { type: "image/png" });
 
-    return URL.createObjectURL(blob);
-  }
+  //   return URL.createObjectURL(blob);
+  // }
 
-  async function ImagemPerfil() {
+  async function ImagemPer() {
     const formData = new FormData();
 
     formData.append("imagem", imagem);
-    formData.append("id", id)
+    formData.append("id", id);
+    if (!imagem) {
+      return alert("Selecione uma imagem");
+    }
     try {
-      const resposta = await api.put(`/imagem`, formData);
+      const resposta = await api.put(`/imagem/${id}`, formData);
       if (resposta.status == 201) {
         alert("Perfil atualizado!");
         return window.location.reload();
@@ -99,8 +103,29 @@ export default function Header() {
       }
     } catch (error) {
       alert("Erro inesperado");
+      console.log(error);
     }
   }
+
+async function ImagemPerfil() {
+  try {
+    const resposta = await api.get(`/imagem/${id}`);
+
+    return resposta.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+  useEffect(() => {
+    ImagemPerfil().then((i) => {
+      console.log(i)
+      const byteArray = new Uint8Array(i.data || imagem);
+      const blob = new Blob([byteArray], { type: "image/png" });
+      const url = URL.createObjectURL(blob);
+      setImagem(url);
+    });
+  }, []);
 
   return (
     <header className="flex items-center justify-between bg-[#0d1aa6] px-6 h-25 w-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] text-white">
@@ -127,7 +152,7 @@ export default function Header() {
         <h5>{conta}</h5>
         <img
           onClick={() => setPerfil(true)}
-          src={converter()}
+          src={imagem}
           alt="Perfil"
           className="w-10 h-10 rounded-full object-cover border-2 border-white"
         />
@@ -148,7 +173,10 @@ export default function Header() {
                   onChange={(e) => setImagem(e.target.files[0])}
                   className="w-full border border-black rounded p-2 text-black"
                 />
-                <button onClick={()=> ImagemPerfil()} className="w-50 h-10 bg-blue-600 text-white rounded hover:bg-[#0d1aa6]">
+                <button
+                  onClick={() => ImagemPer()}
+                  className="w-50 h-10 bg-blue-600 text-white rounded hover:bg-[#0d1aa6]"
+                >
                   Atualizar foto
                 </button>
               </div>
@@ -171,7 +199,7 @@ export default function Header() {
           </button>
 
           <button
-            onClick={sair}
+            onClick={()=>sair()}
             className="px-4 py-2 bg-gray-300 text-black rounded cursor-pointer"
           >
             Logout
