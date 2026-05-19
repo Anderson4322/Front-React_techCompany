@@ -68,6 +68,7 @@ const HomePage = () => {
               <NavButton onClick={()=>carregarLogout()}>Sair</NavButton>
             )}
           </div>
+          
         </div>
       </header>
     </div>

@@ -24,8 +24,9 @@ export default function Header() {
   }
 
   function sair() {
-    localStorage.removeItem("token");
-    navigate("/logout");
+    localStorage.clear()
+    alert("Saindo..")
+    navigate("/login");
   }
 
   function limpar() {

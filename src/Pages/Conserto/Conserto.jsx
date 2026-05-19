@@ -73,6 +73,7 @@ export default function App() {
       }
     } catch (error) {
       alert("Erro inesperado");
+      console.log("erro em.. "+error)
     }
   }
 

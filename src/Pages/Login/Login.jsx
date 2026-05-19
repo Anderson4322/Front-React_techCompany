@@ -20,17 +20,24 @@ export default function Login() {
       localStorage.setItem("id", resposta.data.id_usuario);
       localStorage.setItem("imagem", resposta.data.data);
       if (resposta.nivel == 3) {
+        alert("Login concluido")
         navigate("/Admin");
       } else {
+        alert("Login concluido")
         navigate("/", { replace: true });
       }
     } catch (erro) {
-      console.log(erro);
+      console.log("Erro ao logar"+erro);
     }
   }
 
   function Verificar() {
-    email == "" || senha == "" ? setSpan(true) : Logar();
+    if(email ==""|| senha ==""){
+      return alert("Preencha todos os campos!!")
+    }
+    else{
+      Logar()
+    }
   }
 
   return (
@@ -84,20 +91,7 @@ export default function Login() {
         </div>
       </div>
 
-      {span && (
-        <div className=" fixed inset-0 z-50 bg-black/50 w-full flex justify-center items-center">
-          <div className="bg-white shadow-xl rounded-2xl p-5">
-            <button
-              className="w-5 hover:scale-125 hover:bg-gray-50"
-              onClick={() => setSpan(false)}
-            >
-              X
-            </button>
-            <h1>Ops Voce não completou corretamento os campos</h1>
-            <p>Feche e complete os campos para login</p>
-          </div>
-        </div>
-      )}
+   
     </div>
   );
 }
