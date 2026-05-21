@@ -41,7 +41,7 @@ const HomePage = () => {
               ? `Bem vindo usuário: ${usuario}`
               : nivel == 3
                 ? `Bem vindo Administrador: ${usuario}`:
-                nivel ==2? `Bem vindo profissional: ${usuario}`
+                nivel ==2? `Bem vindo Profissional: ${usuario}`
                 : "Bem vindo visitante"
                 }
           </h5>

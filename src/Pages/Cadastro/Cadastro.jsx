@@ -107,6 +107,12 @@ function App() {
                 onChange={(e) => setSenha(e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-[10px] focus:border-[#7c4dff] focus:outline-none focus:ring-2 focus:ring-[#7c4dff]/20 transition-all text-sm"
               />
+              <details><summary>Dica de senha:</summary>
+              <li>mínimo de 8 caracteres</li>
+              <li>precisa ter pelo menos 1 número</li>
+              <li>precisa ter pelo menos 1 letra maiúscula</li>
+              <li>precisa ter pelo menos 1 letra minúscula</li>
+              </details>
             </div>
 
             <button

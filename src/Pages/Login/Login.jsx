@@ -4,7 +4,7 @@ import axios from "axios";
 import { api } from "../../../api/api-config";
 export default function Login() {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState();
+  const [senha, setSenha] = useState("");
   const [span, setSpan] = useState(false);
   const navigate = useNavigate();
 
@@ -16,18 +16,17 @@ export default function Login() {
       });
 
       localStorage.setItem("nome", resposta.data.nome);
+      localStorage.setItem("email", resposta.data.email);
       localStorage.setItem("nivel", resposta.data.nivel);
       localStorage.setItem("id", resposta.data.id_usuario);
-      localStorage.setItem("imagem", resposta.data.data);
-      if (resposta.nivel == 3) {
-        alert("Login concluido")
-        navigate("/Admin");
+      if (resposta.nivel === 3) {
+        navigate("/Admin", { replace: true });
       } else {
         alert("Login concluido")
         navigate("/", { replace: true });
       }
     } catch (erro) {
-      console.log("Erro ao logar"+erro);
+      console.log("Erro ao logar: "+erro);
     }
   }
 

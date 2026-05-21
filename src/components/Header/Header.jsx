@@ -6,12 +6,12 @@ export default function Header() {
   const [menuAberto, setMenuAberto] = useState(false);
   const [conta, setConta] = useState(localStorage.getItem("nome"));
   const [open, setOpen] = useState(false);
+  const nivel = localStorage.getItem("nivel")
   const [perfil, setPerfil] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState(0);
   const [endereco, setEndereco] = useState("");
-  const [telefone, setTelefone] = useState("");
   const id = localStorage.getItem("id");
   const [imagem, setImagem] = useState(null);
   const [msg, setMsg] = useState("");
@@ -33,26 +33,24 @@ export default function Header() {
     setEmail("");
     setNome("");
     setEndereco("");
-    setTelefone("");
     setSenha("");
     setImagem(null);
     setMsg("");
   }
 
-  async function AtualizarPerfil(id) {
+  async function AtualizarPerfil() {
     try {
-      const resposta = await api.put(
-        `/alt_user/${id}`,
+      const resposta = await api.put(`/alt_user/${id}`,{
         nome,
+        email,
         senha,
-        endereco,
-        telefone,
-      );
+        endereco
+      });
       console.log(id);
 
       if (resposta.status == 201) {
-        setOpen(false);
         alert("Perfil atualizado");
+        setOpen(false);
       } else {
         return alert("algo deu errado");
       }
@@ -65,10 +63,7 @@ export default function Header() {
     if (
       nome === "" ||
       endereco === "" ||
-      email === "" ||
-      telefone === "" ||
-      !imagem
-    ) {
+      email === "") {
       setMsg("Preencha todos os Campos!!!!");
       return;
     }
@@ -150,7 +145,7 @@ async function ImagemPerfil() {
       </div>
 
       <div className="flex items-center gap-4">
-        <h5>{conta}</h5>
+        <h5>{nivel==2 ? (`Bem vindo Profissional: ${conta}`): "Bem vindo usuario: "+conta}</h5>
         <img
           onClick={() => setPerfil(true)}
           src={imagem}
@@ -253,17 +248,6 @@ async function ImagemPerfil() {
                   className="w-full border border-black rounded p-2 text-black"
                 />
               </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-black font-medium">Telefone:</label>
-
-                <input
-                  value={telefone}
-                  type="tel"
-                  onChange={(e) => setTelefone(e.target.value)}
-                  className="w-full border border-black rounded p-2 text-black"
-                />
-              </div>
               <div className="flex flex-col gap-1">
                 <label className="text-black font-medium">Senha:</label>
 
@@ -287,7 +271,7 @@ async function ImagemPerfil() {
                 </button>
 
                 <button
-                  onClick={() => AtualizarPerfil(id)}
+                  onClick={() => Trocar()}
                   className="px-4 py-2 bg-[#0d1aa6] text-white rounded"
                 >
                   Enviar
