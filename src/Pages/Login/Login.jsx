@@ -22,20 +22,19 @@ export default function Login() {
       if (resposta.nivel === 3) {
         navigate("/Admin", { replace: true });
       } else {
-        alert("Login concluido")
+        alert("Login concluido");
         navigate("/", { replace: true });
       }
     } catch (erro) {
-      console.log("Erro ao logar: "+erro);
+      console.log("Erro ao logar: " + erro);
     }
   }
 
   function Verificar() {
-    if(email ==""|| senha ==""){
-      return alert("Preencha todos os campos!!")
-    }
-    else{
-      Logar()
+    if (email == "" || senha == "") {
+      return alert("Preencha todos os campos!!");
+    } else {
+      Logar();
     }
   }
 
@@ -72,7 +71,12 @@ export default function Login() {
           <label className="text-gray-700 self-start ml-10">Senha:</label>
 
           <input
-            className="w-80 rounded-lg h-10 px-3 border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#8b4dff]/40"
+            className={`w-80 rounded-lg h-10 px-3 border bg-white focus:outline-none focus:ring-2 transition-all
+${
+  senha.length < 5
+    ? "border-red-500 focus:ring-red-500/40"
+    : "border-gray-300 focus:ring-[#8b4dff]/40"
+}`}
             value={senha}
             onChange={(e) => {
               setSenha(e.target.value);
@@ -80,6 +84,9 @@ export default function Login() {
             type="password"
             placeholder="Digite sua senha"
           />
+          {senha.length < 8 ? (
+            <div>Senha deve ter mais de 8 caracteres</div>
+          ) : null}
 
           <button
             onClick={() => Verificar()}
@@ -89,8 +96,6 @@ export default function Login() {
           </button>
         </div>
       </div>
-
-   
     </div>
   );
 }

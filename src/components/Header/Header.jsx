@@ -6,15 +6,17 @@ export default function Header() {
   const [menuAberto, setMenuAberto] = useState(false);
   const [conta, setConta] = useState(localStorage.getItem("nome"));
   const [open, setOpen] = useState(false);
-  const nivel = localStorage.getItem("nivel")
+  const nivel = localStorage.getItem("nivel");
   const [perfil, setPerfil] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState(0);
+  const [senha, setSenha] = useState("");
   const [endereco, setEndereco] = useState("");
   const id = localStorage.getItem("id");
   const [imagem, setImagem] = useState(null);
   const [msg, setMsg] = useState("");
+  const [openAtualiza, setOpenAtualiza] = useState(false);
+  
 
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -24,8 +26,8 @@ export default function Header() {
   }
 
   function sair() {
-    localStorage.clear()
-    alert("Saindo..")
+    localStorage.clear();
+    alert("Saindo..");
     navigate("/login");
   }
 
@@ -38,19 +40,36 @@ export default function Header() {
     setMsg("");
   }
 
-  async function AtualizarPerfil() {
+  async function ReceberDados() {
     try {
-      const resposta = await api.put(`/alt_user/${id}`,{
-        nome,
+      const { data }= await api.get(`/usuarios/${id}`);
+  
+      setNome(data.nome);
+      setEmail(data.email);
+      setEndereco(data.endereco);
+      setSenha(data.senha);
+      console.log(data)
+      setOpen(true);
+    } catch (error) {
+      console.error("Erro ao buscar os dados do usuário:", error);
+    }
+  }
+
+  async function AtualizarPerfil() {
+    ReceberDados();
+
+    try {
+      const resposta = await api.put(`/alt_user/${id}`, {
+        nome: prompt("Digite o valor", nome),
         email,
         senha,
-        endereco
+        endereco,
       });
       console.log(id);
 
       if (resposta.status == 201) {
-        alert("Perfil atualizado");
-        setOpen(false);
+        setOpenAtualiza(true);
+        localStorage.clear();
       } else {
         return alert("algo deu errado");
       }
@@ -59,27 +78,9 @@ export default function Header() {
     }
   }
 
-  function Trocar() {
-    if (
-      nome === "" ||
-      endereco === "" ||
-      email === "") {
-      setMsg("Preencha todos os Campos!!!!");
-      return;
-    }
-
-    AtualizarPerfil();
+  function Login() {
+    navigate("/Login");
   }
-
-  // function converter() {
-  //   console.log(imagem);
-  //   if (!imagem) return null;
-
-  //   const byteArray = new Uint8Array(imagem.data || imagem);
-  //   const blob = new Blob([byteArray], { type: "image/png" });
-
-  //   return URL.createObjectURL(blob);
-  // }
 
   async function ImagemPer() {
     const formData = new FormData();
@@ -103,19 +104,18 @@ export default function Header() {
     }
   }
 
-async function ImagemPerfil() {
-  try {
-    const resposta = await api.get(`/imagem/${id}`);
+  async function ImagemPerfil() {
+    try {
+      const resposta = await api.get(`/imagem/${id}`);
 
-    return resposta.data;
-  } catch (error) {
-    console.log(error);
+      return resposta.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
-}
 
   useEffect(() => {
     ImagemPerfil().then((i) => {
-      console.log(i)
       const byteArray = new Uint8Array(i.data || imagem);
       const blob = new Blob([byteArray], { type: "image/png" });
       const url = URL.createObjectURL(blob);
@@ -145,7 +145,11 @@ async function ImagemPerfil() {
       </div>
 
       <div className="flex items-center gap-4">
-        <h5>{nivel==2 ? (`Bem vindo Profissional: ${conta}`): "Bem vindo usuario: "+conta}</h5>
+        <h5>
+          {nivel == 2
+            ? `Bem vindo Profissional: ${conta}`
+            : "Bem vindo usuario: " + conta}
+        </h5>
         <img
           onClick={() => setPerfil(true)}
           src={imagem}
@@ -188,14 +192,16 @@ async function ImagemPerfil() {
       {menuAberto && (
         <div className="absolute right-4 top-16 bg-white text-black p-4 rounded shadow-lg flex flex-col gap-4 w-48">
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              ReceberDados();
+            }}
             className="px-4 py-2 bg-gray-300 text-black rounded cursor-pointer"
           >
             Perfil
           </button>
 
           <button
-            onClick={()=>sair()}
+            onClick={() => sair()}
             className="px-4 py-2 bg-gray-300 text-black rounded cursor-pointer"
           >
             Logout
@@ -271,13 +277,36 @@ async function ImagemPerfil() {
                 </button>
 
                 <button
-                  onClick={() => Trocar()}
+                  onClick={() => AtualizarPerfil(id)}
                   className="px-4 py-2 bg-[#0d1aa6] text-white rounded"
                 >
                   Enviar
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ALERTA DE PERFIL ATUALIZADO */}
+      {openAtualiza && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center w-screen p-4 z-50">
+          <div className="w-[95%] max-w-2xl rounded-2xl shadow-xl border-2 bg-white p-4 md:p-6">
+            <button
+              onClick={() => Login()}
+              className="w-12 h-10 rounded-4xl bg-red-500 hover:bg-red-700 text-white transition"
+            >
+              X
+            </button>
+
+            <p className="text-xl md:text-3xl text-blue-700 mt-4">
+              Suas informações foram atualizadas, relogue para receber suas
+              informações
+            </p>
+
+            <p className="text-center mt-4 text-gray-600">
+              Feche para ser direcionado ao login
+            </p>
           </div>
         </div>
       )}

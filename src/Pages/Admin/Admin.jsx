@@ -74,7 +74,7 @@ export default function Header() {
   function Login() {
     localStorage.clear();
     alert("Saindo...");
-    navigate("/login");
+   navigate("/login", {replace:true});
   }
 
   function Home() {

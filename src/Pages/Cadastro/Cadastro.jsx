@@ -10,7 +10,7 @@ function App() {
   const navigate = useNavigate();
   async function Cadastro() {
     try {
-      const resposta = await api.post('/cadastro/user', {
+      const resposta = await api.post("/cadastro/user", {
         nome,
         email,
         senha,
@@ -105,13 +105,22 @@ function App() {
                 required
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-[10px] focus:border-[#7c4dff] focus:outline-none focus:ring-2 focus:ring-[#7c4dff]/20 transition-all text-sm"
+                className={`w-full px-4 py-2.5 border rounded-[10px] focus:outline-none transition-all text-sm
+          ${
+                  senha.length < 8
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#7c4dff] focus:ring-2 focus:ring-[#7c4dff]/20"
+            }`}
+            
               />
-              <details><summary>Dica de senha:</summary>
-              <li>mínimo de 8 caracteres</li>
-              <li>precisa ter pelo menos 1 número</li>
-              <li>precisa ter pelo menos 1 letra maiúscula</li>
-              <li>precisa ter pelo menos 1 letra minúscula</li>
+                  {senha.length < 8 ? (
+            <div>Senha deve ter mais de 8 caracteres</div>
+          ) : null}
+              <details>
+                <summary>Dica de senha:</summary>
+                <li>precisa ter pelo menos 1 número</li>
+                <li>precisa ter pelo menos 1 letra maiúscula</li>
+                <li>precisa ter pelo menos 1 letra minúscula</li>
               </details>
             </div>
 

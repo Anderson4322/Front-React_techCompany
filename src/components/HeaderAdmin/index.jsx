@@ -19,8 +19,8 @@ export default function Header() {
   }
 
   function sair() {
-    localStorage.removeItem("token");
-    navigate("/logout");
+    localStorage.clear()
+    navigate("/login", {replace:true});
   }
   function limpar() {
     setEmail("");

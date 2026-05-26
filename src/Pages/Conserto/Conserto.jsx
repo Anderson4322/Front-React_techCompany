@@ -69,25 +69,9 @@ export default function App() {
     }
   }
 
-  async function Enviar_comentario() {
-    try {
-      const {data} = await api.get(`/pedidos/${id_pedido}`);
-      const res = await api.put(`/comentarios/${data.id_pedido}`, {
-        comentarios,
-      });
 
-      if (resposta.status == 201) {
-        alert("Comentario enviado com sucesso");
-      } else {
-        alert("Erro ao enviar");
-      }
-    } catch (error) {
-      alert("Comentario inválido!");
-      console.log(error);
-    }
-  }
   return (
-    <div className="min-h-screen bg-[#f5f7ff]">
+    <div className="min-h-screen">
       <Header />
 
       <main className="flex flex-col max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
