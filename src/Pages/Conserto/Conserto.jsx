@@ -17,8 +17,9 @@ export default function App() {
   const [comentarios, setComentarios] = useState("");
   const [dados, setDados] = useState([]);
   const [imagem, setImagem] = useState("");
+  const[openPedidoSucesso,setOpenPedidoSucesso]= useState(false)
+  const[openPedidoErro,setOpenPedidoErro] = useState(false)
   const navigate = useNavigate();
-
 
   function trocar() {
     nome == "" ||
@@ -29,6 +30,9 @@ export default function App() {
     imagem == ""
       ? setMsg("Preencha todos os Campos!!!!")
       : cadastrar();
+  }
+  function Carregamento(){
+    window.location.reload()
   }
 
   function limpar() {
@@ -59,16 +63,15 @@ export default function App() {
       const resposta = await api.post(`/cad_pedidos`, formData);
 
       if (resposta.status == 201) {
-        return window.location.reload();
+        setOpenPedidoSucesso(true)
       } else {
         alert("Erro ao cadastro de pedido");
       }
     } catch (error) {
-      alert("Erro inesperado");
+      setOpenPedidoErro(true)
       console.log("erro em.. " + error);
     }
   }
-
 
   return (
     <div className="min-h-screen">
@@ -88,7 +91,7 @@ export default function App() {
           </button>
         </div>
       </main>
-     <Cards/>
+      <Cards />
 
       {/* ALERTA LOGIN */}
       {!alerta && (
@@ -166,11 +169,12 @@ export default function App() {
               <label className="text-black font-medium">Telefone:</label>
 
               <input
-                type="text"
+                type="tel"
                 placeholder="Digite seu telefone"
                 className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#0d1aa6]/40"
                 value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
+                maxLength={11}
+                onChange={(e) => setTelefone(e.target.value.replace(/\D/g, ""))}
               />
 
               <div className="flex flex-col">
@@ -212,6 +216,92 @@ export default function App() {
           </div>
         </div>
       )}
+      {openPedidoSucesso && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+
+    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-300">
+
+      <div className="flex flex-col items-center text-center gap-4">
+
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-800">
+          Pedido concluído!
+        </h1>
+
+        <p className="text-gray-500 text-sm">
+          Seu pedido foi enviado com sucesso.
+        </p>
+
+        <button
+          onClick={() => {setOpenPedidoSucesso(false); Carregamento()}}
+          className="mt-2 bg-[#8b4dff] hover:bg-[#7a3fff] transition-all text-white font-medium px-6 py-2.5 rounded-xl"
+        >
+          Fechar
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+{openPedidoErro && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+
+    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-300">
+
+      <div className="flex flex-col items-center text-center gap-4">
+
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.67 18h16.66a1 1 0 00.88-1.5l-7.5-13a1 1 0 00-1.74 0z"
+            />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-800">
+          Erro no pedido
+        </h1>
+
+        <p className="text-gray-500 text-sm">
+          Não foi possível concluir o pedido. Tente novamente.
+        </p>
+
+        <button
+          onClick={() => setOpenPedidoErro(false)}
+          className="mt-2 bg-[#8b4dff] hover:bg-[#7a3fff] transition-all text-white font-medium px-6 py-2.5 rounded-xl"
+        >
+          Tentar novamente
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

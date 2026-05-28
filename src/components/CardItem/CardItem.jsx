@@ -65,7 +65,7 @@ const CardItem = ({ pedido }) => {
         <p className="mt-2 text-sm text-gray-600 wrap-break-word">
           {pedido.comentario || "Nenhum comentário"}
         </p>
-        {nivel == 2 && (
+        {nivel == 2 || nivel == 3 && (
           <div>
             <input
               value={comentario}

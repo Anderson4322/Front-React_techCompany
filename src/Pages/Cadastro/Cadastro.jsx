@@ -6,6 +6,8 @@ function App() {
   const [email, setEmail] = useState("");
   const [endereco, setEndereco] = useState("");
   const [senha, setSenha] = useState("");
+  const[open,setOpen]= useState(false)
+  const[openErroCadastro,setOpenErroCadastro] = useState(false)
 
   const navigate = useNavigate();
   async function Cadastro() {
@@ -18,15 +20,18 @@ function App() {
       });
 
       if (resposta.status == 201) {
-        alert("Cadastrado com sucesso");
-        navigate("/Login");
+        setOpen(true)
+       
       } else {
-        alert("Cadastro inválido! Ou Email já cadastrado");
-      }
+        alert("Cadastro inválido!");
+      } 
     } catch (error) {
-      alert("Cadastro inválido!");
+      setOpenErroCadastro(true)
       console.log(error);
     }
+  }
+  function Login(){
+     navigate("/Login");
   }
 
   return (
@@ -131,6 +136,91 @@ function App() {
             >
               CADASTRAR
             </button>
+           {open && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    
+    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-300">
+      
+      <div className="flex flex-col items-center text-center gap-4">
+        
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-800">
+          Cadastro concluído!
+        </h1>
+
+        <p className="text-gray-500 text-sm">
+          Seu cadastro foi realizado com sucesso.
+        </p>
+
+        <button
+          onClick={() => {setOpen(false); Login()}}
+          className="mt-2 bg-[#8b4dff] hover:bg-[#7a3fff] transition-all text-white font-medium px-6 py-2.5 rounded-xl"
+        >
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{openErroCadastro && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    
+    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-300">
+      
+      <div className="flex flex-col items-center text-center gap-4">
+
+        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+          <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-8 h-8 text-red-600"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8v4m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.67 18h16.66a1 1 0 00.88-1.5l-7.5-13a1 1 0 00-1.74 0z"
+    />
+  </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-800">
+          Cadastro inválido
+        </h1>
+
+        <p className="text-gray-500 text-sm">
+          Este email já está cadastrado ou os dados informados são inválidos.
+        </p>
+
+        <button
+          onClick={() => setOpenErroCadastro(false)}
+          className="mt-2 bg-[#8b4dff] hover:bg-[#7a3fff] transition-all text-white font-medium px-6 py-2.5 rounded-xl"
+        >
+          Tentar novamente
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
           </div>
         </div>
       </div>
