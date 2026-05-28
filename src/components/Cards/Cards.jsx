@@ -3,17 +3,35 @@ import { useState, useEffect } from "react";
 import CardItem from "../CardItem/CardItem.jsx";
 export default function Cards() {
   const nivel = localStorage.getItem("nivel");
+  const id_usuario = localStorage.getItem("id")
   const [comentario, setComentario] = useState("");
   const [dados, setDados] = useState([]);
 
+  // async function buscarUsuarios() {
+  //   try {
+  //     const resposta = await api.get(`/pedidos`);
+  //     setDados(resposta.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   async function buscarUsuarios() {
-    try {
-      const resposta = await api.get(`/pedidos`);
-      setDados(resposta.data);
-    } catch (error) {
-      console.log(error);
-    }
+
+  try {
+
+    const resposta = await api.get(
+      `/pedidos/${nivel}/${id_usuario}`
+    );
+
+    setDados(resposta.data);
+
+  } catch (error) {
+
+    console.log(error);
+
   }
+}
+
 
   async function Enviar_comentario(id_pedido) {
     if(!comentario || comentario == null){

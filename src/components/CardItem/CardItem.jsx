@@ -76,6 +76,9 @@ const CardItem = ({ pedido }) => {
               placeholder="Digite um comentário..."
               className="mt-3 border border-black rounded p-2 w-full overflow-hidden resize-none focus:outline-none"
             />
+            <h4>
+          Valor do serviço: {pedido.valor}
+            </h4>
             <button
               className="mt-3 bg-[#0d1aa6] hover:bg-[#09157f] cursor-pointer text-white font-semibold px-4 py-2 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
               onClick={() => Enviar_comentario(pedido.id_pedido)}

@@ -8,6 +8,7 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [alerta, setAlerta] = useState(localStorage.getItem("nivel"));
   const [nome, setNome] = useState("");
+  const id_usuario = localStorage.getItem("id")
   const nivel = localStorage.getItem("nivel");
   const [descricao, setDes] = useState("");
   const [tipoeletronico, setTipo] = useState("");
@@ -53,6 +54,7 @@ export default function App() {
     const formData = new FormData();
 
     formData.append("descricao", descricao);
+    formData.append("id_usuario", id_usuario)
     formData.append("nome", nome);
     formData.append("tipoeletronico", tipoeletronico);
     formData.append("modelo", modelo);

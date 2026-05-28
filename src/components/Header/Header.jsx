@@ -17,6 +17,7 @@ export default function Header() {
   const [msg, setMsg] = useState("");
   const [openAtualiza, setOpenAtualiza] = useState(false);
   const[openSair,setOpenSair]= useState(false)
+  const[openFotoSucesso, setOpenFotoSucesso]= useState(false)
   
 
   const navigate = useNavigate();
@@ -92,8 +93,8 @@ export default function Header() {
     try {
       const resposta = await api.put(`/imagem/${id}`, formData);
       if (resposta.status == 201) {
-        alert("Perfil atualizado!");
-        return window.location.reload();
+       setOpenFotoSucesso(true)
+        return 
       } else {
         alert("Erro ao atualizar perfil");
       }
@@ -124,7 +125,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center justify-between bg-[#0d1aa6] px-6 h-25 w-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] text-white">
-      <img src="../public/logo.svg" className="h-12 object-contain" />
+      <img src="../public/logo.svg" className="h-20 object-contain" />
 
       <div className="flex gap-6 text-lg">
         <button onClick={() => navigate("/Sobre")} className="hover:underline">
@@ -337,6 +338,49 @@ export default function Header() {
         >
           Fechar
         </button>
+      </div>
+    </div>
+  </div>
+)}
+{openFotoSucesso && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+
+    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-300">
+
+      <div className="flex flex-col items-center text-center gap-4">
+
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-8 h-8 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-800">
+          Foto atualizada!
+        </h1>
+
+        <p className="text-gray-500 text-sm">
+          Sua foto de perfil foi atualizada com sucesso.
+        </p>
+
+        <button
+          onClick={() => {setOpenFotoSucesso(false); window.location.reload();}}
+          className="mt-2 bg-[#8b4dff] hover:bg-[#7a3fff] transition-all text-white font-medium px-6 py-2.5 rounded-xl"
+        >
+          Fechar
+        </button>
+
       </div>
     </div>
   </div>
